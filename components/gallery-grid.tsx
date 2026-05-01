@@ -1,24 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import { Lightbox } from "./lightbox";
-
-const galleryImages = [
-  { src: "/images/gallery/wedding-1.jpg", category: "wedding", alt: "Wedding ceremony" },
-  { src: "/images/gallery/fashion-1.jpg", category: "fashion", alt: "Fashion editorial" },
-  { src: "/images/gallery/events-1.jpg", category: "events", alt: "Corporate event" },
-  { src: "/images/gallery/wedding-2.jpg", category: "wedding", alt: "Wedding dance" },
-  { src: "/images/gallery/fashion-2.jpg", category: "fashion", alt: "Fashion portrait" },
-  { src: "/images/gallery/events-2.jpg", category: "events", alt: "Celebration" },
-];
-
-const categories = ["all", "wedding", "fashion", "events"];
+import { getStoredCategories, getStoredImages, type GalleryImage } from "@/lib/gallery-data";
 
 export function GalleryGrid() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>(["all"]);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+
+  useEffect(() => {
+    const storedCategories = getStoredCategories();
+    const storedImages = getStoredImages();
+
+    setCategories(["all", ...storedCategories.map((category) => category.id)]);
+    setGalleryImages(storedImages);
+  }, []);
 
   const filteredImages =
     selectedCategory === "all"
@@ -67,7 +66,7 @@ export function GalleryGrid() {
         <AnimatePresence mode="popLayout">
           {filteredImages.map((image, index) => (
             <motion.div
-              key={image.src}
+              key={`${image.src}-${index}`}
               layout
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -78,11 +77,10 @@ export function GalleryGrid() {
               }`}
               onClick={() => setLightboxImage(image.src)}
             >
-              <Image
+              <img
                 src={image.src}
                 alt={image.alt}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300" />
             </motion.div>
@@ -91,10 +89,7 @@ export function GalleryGrid() {
       </motion.div>
 
       {/* Lightbox */}
-      <Lightbox
-        image={lightboxImage}
-        onClose={() => setLightboxImage(null)}
-      />
+      <Lightbox image={lightboxImage} onClose={() => setLightboxImage(null)} />
     </section>
   );
 }
