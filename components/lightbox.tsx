@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import { X } from "lucide-react";
 
 interface LightboxProps {
@@ -54,12 +53,10 @@ export function Lightbox({ image, onClose }: LightboxProps) {
             className="relative w-full max-w-4xl aspect-[4/3] md:aspect-[16/10]"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
+            <img
               src={image}
               alt="Gallery image"
-              fill
-              className="object-contain"
-              quality={90}
+              className="h-full w-full object-contain"
             />
           </motion.div>
         </motion.div>

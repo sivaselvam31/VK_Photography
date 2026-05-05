@@ -27,7 +27,7 @@ const services = [
 
 export function ServiceCards() {
   const whatsappLink =
-    "https://wa.me/1234567890?text=Hello!%20I%27m%20interested%20in%20your%20photography%20services.";
+    "https://wa.me/8883223900?text=Hello!%20I%27m%20interested%20in%20your%20photography%20services.";
 
   return (
     <section id="services" className="py-20 px-4">

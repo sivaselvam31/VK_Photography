@@ -14,10 +14,10 @@ export function AboutSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="relative aspect-[3/4] rounded-2xl overflow-hidden order-2 md:order-1"
+            className="relative aspect-3/4 rounded-2xl overflow-hidden order-2 md:order-1"
           >
             <Image
-              src="/images/photographer.jpg"
+              src="/images/photographer.png"
               alt="Professional photographer"
               fill
               className="object-cover"
@@ -38,9 +38,9 @@ export function AboutSection() {
             <h2 className="text-3xl md:text-4xl font-light text-foreground leading-tight text-balance">
               Capturing Moments That Last Forever
             </h2>
-            <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
+            <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed text-justify">
               <p>
-                With over a decade of experience behind the lens, I specialize in
+                With over a 7 Years of experience behind the lens, I specialize in
                 creating timeless visual narratives that capture the essence of
                 your most precious moments.
               </p>
@@ -60,15 +60,15 @@ export function AboutSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className="mt-8 flex items-center gap-8"
+              className="mt-8 flex items-center justify-center md:justify-start gap-8"
             >
               <div>
-                <p className="text-3xl font-light text-foreground">500+</p>
+                <p className="text-3xl font-light text-foreground">100+</p>
                 <p className="text-sm text-muted-foreground">Projects</p>
               </div>
               <div className="w-px h-12 bg-border" />
               <div>
-                <p className="text-3xl font-light text-foreground">10+</p>
+                <p className="text-3xl font-light text-foreground">7+</p>
                 <p className="text-sm text-muted-foreground">Years</p>
               </div>
               <div className="w-px h-12 bg-border" />

@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
-  const whatsappLink = "https://wa.me/1234567890?text=Hello!%20I%27m%20interested%20in%20your%20photography%20services.";
+  const whatsappLink = "https://wa.me/8883223900?text=Hello!%20I%27m%20interested%20in%20your%20photography%20services.";
 
   return (
     <section id="home" className="relative h-screen w-full overflow-hidden">

@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/navbar";
 import { HeroSection } from "@/components/hero-section";
-import { CategorySlider } from "@/components/category-slider";
 import { GalleryGrid } from "@/components/gallery-grid";
 import { AboutSection } from "@/components/about-section";
 import { ServiceCards } from "@/components/service-cards";
@@ -13,13 +12,12 @@ export default function Home() {
     <main className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
-      {/* <CategorySlider /> */}
       <GalleryGrid />
       <AboutSection />
       <ServiceCards />
       <Footer />
       <WhatsAppFloatingButton />
-      <StickyBottomBar />
+      {/* <StickyBottomBar /> */}
     </main>
   );
 }
