@@ -18,7 +18,7 @@ export function Footer() {
           {/* Brand */}
           <div>
             <h3 className="text-2xl font-semibold tracking-tight mb-4">
-              Lumière
+              VK Photography
             </h3>
             <p className="text-background/70 text-sm leading-relaxed">
               Capturing life&apos;s most beautiful moments with elegance and
@@ -58,6 +58,7 @@ export function Footer() {
           </div>
 
           {/* Contact */}
+          { /* 
           <div>
             <h4 className="font-medium mb-4">Get in Touch</h4>
             <div className="flex flex-col gap-3">
@@ -79,11 +80,24 @@ export function Footer() {
               </a>
             </div>
           </div>
+           */}
+
+          {/* Location */}
+
+          <div>
+            <h4 className="font-medium mb-4">Location</h4>
+            <div className="flex flex-col gap-2">
+              <p className="text-sm text-background/70">NO. 148/11, Pudupalyam Street,</p>
+              <p className="text-sm text-background/70">Pillaiyarpalayam, Kanchipuram.</p>
+              <p className="text-sm text-background/70">ph : +91 8883330874</p>
+            </div>
+          </div>
+
         </div>
 
         <div className="mt-12 pt-8 border-t border-background/20 text-center">
           <p className="text-sm text-background/50">
-            © {new Date().getFullYear()} Lumière Photography. All rights
+            © {new Date().getFullYear()} VK Photography. All rights
             reserved.
           </p>
         </div>

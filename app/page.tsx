@@ -17,7 +17,7 @@ export default function Home() {
       <ServiceCards />
       <Footer />
       <WhatsAppFloatingButton />
-      <StickyBottomBar />
+      {/* <StickyBottomBar /> */}
     </main>
   );
 }
