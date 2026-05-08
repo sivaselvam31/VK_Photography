@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Plus, Loader2, ImageUp, CheckCircle2 } from "lucide-react";
+import { upload } from "@vercel/blob/client";
+import imageCompression from "browser-image-compression";
 import { Category, GalleryImage } from "@/lib/gallery-data";
 import { CategoriesTable } from "@/components/categories-table";
 import { ImagesTable } from "@/components/images-table";
@@ -34,6 +36,7 @@ export function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [selectedFileSize, setSelectedFileSize] = useState<number | null>(null);
   const [fileSizeError, setFileSizeError] = useState<string | null>(null);
@@ -343,7 +346,7 @@ export function AdminPanel() {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*,.svg,.psd,.ai,.eps,.psb"
+                    accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif"
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
@@ -363,30 +366,53 @@ export function AdminPanel() {
                       }
 
                       setUploading(true);
+                      setUploadProgress(0);
                       setUploadedFileName(null);
                       try {
-                        const formData = new FormData();
-                        formData.append("file", file);
+                        // Compress image if needed
+                        let fileToUpload = file;
+                        const options = {
+                          maxSizeMB: 5, // Compress if larger than 5MB
+                          maxWidthOrHeight: 2560, // Max dimension
+                          useWebWorker: true,
+                          fileType: "image/webp", // Convert to WebP for better compression
+                          initialQuality: 0.8,
+                        };
 
-                        const res = await fetch("/api/upload", {
-                          method: "POST",
-                          body: formData,
-                        });
-
-                        if (!res.ok) {
-                          const err = await res.json();
-                          showImageMessage("error", err.error ?? "Upload failed.");
-                          return;
+                        if (file.size > 5 * 1024 * 1024) {
+                          try {
+                            fileToUpload = await imageCompression(file, options);
+                          } catch (compressionErr) {
+                            console.warn("Compression failed, using original file", compressionErr);
+                            // Fall back to original file if compression fails
+                          }
                         }
 
-                        const { src } = await res.json();
-                        setImageForm((prev) => ({ ...prev, src }));
+                        // Generate unique filename
+                        const ext = fileToUpload.type === "image/webp" 
+                          ? "webp" 
+                          : fileToUpload.name.split(".").pop()?.toLowerCase() || "jpg";
+                        const filename = `gallery-${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
+
+                        // Upload directly to Blob
+                        const blob = await upload(filename, fileToUpload, {
+                          access: "public",
+                          handleUploadUrl: "/api/upload",
+                          onUploadProgress: (event) => {
+                            setUploadProgress(Math.round(event.percentage));
+                          },
+                        });
+
+                        setImageForm((prev) => ({ ...prev, src: blob.url }));
                         setUploadedFileName(file.name);
+                        setUploadProgress(0);
                         showImageMessage("success", "File uploaded successfully!");
-                      } catch {
-                        showImageMessage("error", "Upload failed. Please try again.");
+                      } catch (err) {
+                        const errorMsg = err instanceof Error ? err.message : "Upload failed. Please try again.";
+                        showImageMessage("error", errorMsg);
                       } finally {
                         setUploading(false);
+                        setUploadProgress(0);
                         setSelectedFileSize(null);
                         // Reset input so the same file can be re-selected
                         if (fileInputRef.current)
@@ -406,10 +432,14 @@ export function AdminPanel() {
                     title="Click to upload image"
                   >
                     {uploading ? (
-                      <Loader2 size={20} className="animate-spin" />
+                      <>
+                        <Loader2 size={20} className="animate-spin" />
+                        {uploadProgress > 0 && <span className="text-sm">{uploadProgress}%</span>}
+                      </>
                     ) : (
                       <ImageUp size={15} /> 
-                    )} Choose local file 
+                    )} 
+                    {!uploading && "Choose local file"}
                   </label>
                   {uploadedFileName && !uploading && !fileSizeError && (
                     <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">

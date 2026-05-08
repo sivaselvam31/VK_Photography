@@ -1,61 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 
 export const runtime = "nodejs";
 
 // 50MB in bytes
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-// Supported image file extensions
-const ALLOWED_EXTENSIONS = [
-  "jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "tiff", "ico",
-  "psd", "ai", "eps", "psd", "psb"
+// Allowed image file extensions (common web-friendly formats)
+const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "avif"];
+
+// Allowed MIME types
+const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
 ];
 
 function isValidImageFile(filename: string, mimeType: string): boolean {
-  const extension = filename.split('.').pop()?.toLowerCase() || "";
-  return ALLOWED_EXTENSIONS.includes(extension) || mimeType.startsWith("image/");
+  const extension = filename.split(".").pop()?.toLowerCase() || "";
+  return (
+    ALLOWED_EXTENSIONS.includes(extension) ||
+    ALLOWED_MIME_TYPES.includes(mimeType)
+  );
 }
 
 export async function POST(req: NextRequest) {
+  const body = (await req.json()) as HandleUploadBody;
+
   try {
-    const formData = await req.formData();
-    const file = formData.get("file") as File;
-    // const alt = formData.get("alt") as string;
-    // const category = formData.get("category") as string;
+    const jsonResponse = await handleUpload({
+      body,
+      request: req,
+      onBeforeGenerateToken: async (
+        pathname: string
+      ): Promise<{ addRandomSuffix: true }> => {
+        // Validate file extension and name
+        if (!isValidImageFile(pathname, "")) {
+          throw new Error(
+            "Only JPG, JPEG, PNG, WebP, and AVIF image files are allowed"
+          );
+        }
 
-    if (!file) {
-      return NextResponse.json({ error: "file is required" }, { status: 400 });
-    }
-
-    if (!isValidImageFile(file.name, file.type)) {
-      return NextResponse.json(
-        { error: "Only image files allowed (JPG, PNG, GIF, WebP, SVG, PSD, etc.)" },
-        { status: 400 },
-      );
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: `File size must be less than 50MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB` },
-        { status: 400 },
-      );
-    }
-
-    const filename = `${Date.now()}-${file.name}`;
-
-    const blob = await put(filename, file, {
-      access: "public",
+        return {
+          addRandomSuffix: true,
+        };
+      },
     });
 
+    return NextResponse.json(jsonResponse);
+  } catch (error) {
+    console.error("[UPLOAD ERROR]", error);
     return NextResponse.json(
       {
-        src: blob.url,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Upload failed. Please try again.",
       },
-      { status: 200 },
+      { status: 400 }
     );
-  } catch (err) {
-    console.error("[UPLOAD ERROR]", err);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
