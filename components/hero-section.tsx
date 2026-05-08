@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, ImageUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
@@ -66,6 +66,12 @@ export function HeroSection() {
               <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
                 <MessageCircle size={18} />
                 Chat on WhatsApp
+              </a>
+            </Button>
+            <Button variant="outline" asChild size="lg" className="bg-secondary text-foreground hover:bg-secondary/90 rounded-full px-8 gap-2 ml-4">
+              <a href="#" target="_blank" rel="noopener noreferrer">
+                <ImageUp size={18} />
+                View Our Work
               </a>
             </Button>
           </motion.div>

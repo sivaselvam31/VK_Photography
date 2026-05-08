@@ -23,12 +23,31 @@ export function AdminPanel() {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [categoryForm, setCategoryForm] = useState<Category>(initialCategory);
   const [imageForm, setImageForm] = useState<GalleryImage>(initialImage);
-  const [status, setStatus] = useState<string | null>(null);
+  const [categoryMessage, setCategoryMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [imageMessage, setImageMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [selectedFileSize, setSelectedFileSize] = useState<number | null>(null);
+  const [fileSizeError, setFileSizeError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
 
   // Confirmation Modal State
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -44,9 +63,14 @@ export function AdminPanel() {
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
 
-  const showStatus = (message: string) => {
-    setStatus(message);
-    window.setTimeout(() => setStatus(null), 3200);
+  const showCategoryMessage = (type: "success" | "error", text: string) => {
+    setCategoryMessage({ type, text });
+    window.setTimeout(() => setCategoryMessage(null), 3200);
+  };
+
+  const showImageMessage = (type: "success" | "error", text: string) => {
+    setImageMessage({ type, text });
+    window.setTimeout(() => setImageMessage(null), 3200);
   };
 
   async function loadData() {
@@ -60,7 +84,8 @@ export function AdminPanel() {
       setCategories(cats);
       setImages(imgs);
     } catch {
-      showStatus("Failed to load data from database.");
+      showCategoryMessage("error", "Failed to load data from database.");
+      showImageMessage("error", "Failed to load data from database.");
     } finally {
       setLoading(false);
     }
@@ -77,17 +102,17 @@ export function AdminPanel() {
 
     const title = categoryForm.title.trim();
     if (!title) {
-      showStatus("Please provide a category title.");
+      showCategoryMessage("error", "Please provide a category title.");
       return;
     }
 
     const id = normalizeId(categoryForm.id || title);
     if (!id) {
-      showStatus("Category ID must contain letters or numbers.");
+      showCategoryMessage("error", "Category ID must contain letters or numbers.");
       return;
     }
     if (categories.some((c) => c.id === id)) {
-      showStatus("A category with that ID already exists.");
+      showCategoryMessage("error", "A category with that ID already exists.");
       return;
     }
 
@@ -101,16 +126,16 @@ export function AdminPanel() {
 
       if (!res.ok) {
         const err = await res.json();
-        showStatus(err.error ?? "Failed to add category.");
+        showCategoryMessage("error", err.error ?? "Failed to add category.");
         return;
       }
 
       const newCat: Category = await res.json();
       setCategories((prev) => [...prev, newCat]);
       setCategoryForm(initialCategory);
-      showStatus("Category added successfully.");
+      showCategoryMessage("success", "Category added successfully.");
     } catch {
-      showStatus("Network error. Please try again.");
+      showCategoryMessage("error", "Network error. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -124,11 +149,11 @@ export function AdminPanel() {
     const category = imageForm.category;
 
     if (!src || !alt || !category) {
-      showStatus("Please complete image source, alt text, and category.");
+      showImageMessage("error", "Please complete image source, alt text, and category.");
       return;
     }
     if (!categories.some((c) => c.id === category)) {
-      showStatus("Please select a valid category.");
+      showImageMessage("error", "Please select a valid category.");
       return;
     }
 
@@ -142,16 +167,16 @@ export function AdminPanel() {
 
       if (!res.ok) {
         const err = await res.json();
-        showStatus(err.error ?? "Failed to add image.");
+        showImageMessage("error", err.error ?? "Failed to add image.");
         return;
       }
 
       const newImg: GalleryImage = await res.json();
       setImages((prev) => [...prev, newImg]);
       setImageForm(initialImage);
-      showStatus("Image added to the gallery.");
+      showImageMessage("success", "Image added to the gallery.");
     } catch {
-      showStatus("Network error. Please try again.");
+      showImageMessage("error", "Network error. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -171,9 +196,9 @@ export function AdminPanel() {
           });
           setCategories((prev) => prev.filter((c) => c.id !== id));
           setImages((prev) => prev.filter((img) => img.category !== id));
-          showStatus("Category removed and related images cleaned up.");
+          showCategoryMessage("success", "Category removed and related images cleaned up.");
         } catch {
-          showStatus("Failed to remove category.");
+          showCategoryMessage("error", "Failed to remove category.");
         } finally {
           setSaving(false);
         }
@@ -195,9 +220,9 @@ export function AdminPanel() {
             method: "DELETE",
           });
           setImages((prev) => prev.filter((img) => img._id !== image._id));
-          showStatus("Image removed.");
+          showImageMessage("success", "Image removed.");
         } catch {
-          showStatus("Failed to remove image.");
+          showImageMessage("error", "Failed to remove image.");
         } finally {
           setSaving(false);
         }
@@ -217,12 +242,6 @@ export function AdminPanel() {
         </p>
       </div>
 
-      {status ? (
-        <div className="mb-6 rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-700">
-          {status}
-        </div>
-      ) : null}
-
       {loading ? (
         <div className="flex items-center justify-center py-24 text-muted-foreground gap-3">
           <Loader2 size={20} className="animate-spin" /> Loading data from
@@ -236,6 +255,16 @@ export function AdminPanel() {
               <h2 className="text-xl font-semibold text-foreground mb-4">
                 Add New Category
               </h2>
+              {categoryMessage ? (
+                <div
+                  className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${
+                    categoryMessage.type === "success"
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      : "border-red-200 bg-red-50 text-red-700"
+                  }`}>
+                  {categoryMessage.text}
+                </div>
+              ) : null}
               <form className="space-y-4" onSubmit={handleAddCategory}>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="block text-sm font-medium text-foreground">
@@ -287,6 +316,16 @@ export function AdminPanel() {
               <h2 className="text-xl font-semibold text-foreground mb-4">
                 Add Gallery Image
               </h2>
+              {imageMessage ? (
+                <div
+                  className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${
+                    imageMessage.type === "success"
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      : "border-red-200 bg-red-50 text-red-700"
+                  }`}>
+                  {imageMessage.text}
+                </div>
+              ) : null}
               <form className="space-y-4" onSubmit={handleAddImage}>
                 <label className="block text-sm font-medium text-foreground">
                   Image source path or URL
@@ -304,10 +343,24 @@ export function AdminPanel() {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/*,.svg,.psd,.ai,.eps,.psb"
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
+
+                      setSelectedFileSize(file.size);
+                      setFileSizeError(null);
+
+                      // Validate file size before upload
+                      if (file.size > MAX_FILE_SIZE) {
+                        setFileSizeError(
+                          `File size (${formatFileSize(file.size)}) exceeds 50MB limit`
+                        );
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = "";
+                        }
+                        return;
+                      }
 
                       setUploading(true);
                       setUploadedFileName(null);
@@ -322,17 +375,19 @@ export function AdminPanel() {
 
                         if (!res.ok) {
                           const err = await res.json();
-                          showStatus(err.error ?? "Upload failed.");
+                          showImageMessage("error", err.error ?? "Upload failed.");
                           return;
                         }
 
                         const { src } = await res.json();
                         setImageForm((prev) => ({ ...prev, src }));
                         setUploadedFileName(file.name);
+                        showImageMessage("success", "File uploaded successfully!");
                       } catch {
-                        showStatus("Upload failed. Please try again.");
+                        showImageMessage("error", "Upload failed. Please try again.");
                       } finally {
                         setUploading(false);
+                        setSelectedFileSize(null);
                         // Reset input so the same file can be re-selected
                         if (fileInputRef.current)
                           fileInputRef.current.value = "";
@@ -343,29 +398,41 @@ export function AdminPanel() {
                   />
                   <label
                     htmlFor="file-upload"
-                    className={`inline-flex items-center gap-2 justify-center rounded-2xl border border-border px-4 py-2 text-sm font-medium transition ${
+                    className={`inline-flex items-center justify-center rounded-full gap-2 px-4 py-2 border-2 border-border transition ${
                       uploading
                         ? "bg-secondary/50 text-muted-foreground cursor-wait"
-                        : "bg-secondary text-foreground hover:bg-secondary/90 cursor-pointer"
+                        : "bg-secondary text-foreground hover:bg-secondary/90 cursor-pointer hover:border-accent"
                     }`}
+                    title="Click to upload image"
                   >
                     {uploading ? (
-                      <>
-                        <Loader2 size={15} className="animate-spin" />{" "}
-                        Uploading…
-                      </>
+                      <Loader2 size={20} className="animate-spin" />
                     ) : (
-                      <>
-                        <ImageUp size={15} /> Choose local file
-                      </>
-                    )}
+                      <ImageUp size={15} /> 
+                    )} Choose local file 
                   </label>
-                  {uploadedFileName && !uploading && (
+                  {uploadedFileName && !uploading && !fileSizeError && (
                     <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
                       <CheckCircle2 size={14} /> {uploadedFileName}
                     </span>
                   )}
+                  {selectedFileSize && !uploading && !fileSizeError && (
+                    <span className="flex items-center gap-1.5 text-xs text-blue-600 font-medium">
+                      {formatFileSize(selectedFileSize)}
+                    </span>
+                  )}
                 </div>
+
+                {fileSizeError && (
+                  <div className="rounded-2xl bg-red-50 border border-red-200 p-3">
+                    <p className="text-sm font-medium text-red-800">
+                      {fileSizeError}
+                    </p>
+                    <p className="text-xs text-red-700 mt-1">
+                      Maximum file size allowed is 50MB
+                    </p>
+                  </div>
+                )}
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="block text-sm font-medium text-foreground">
