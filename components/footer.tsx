@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -97,7 +97,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-background/20 text-center">
           <p className="text-sm text-background/50">
-            © {new Date().getFullYear()} VK Photography. All rights
+            &copy; {new Date().getFullYear()} VK Photography. All rights
             reserved.
           </p>
         </div>

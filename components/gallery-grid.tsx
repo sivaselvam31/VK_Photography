@@ -4,79 +4,16 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Masonry from "react-masonry-css";
 import { type Category, type GalleryImage } from "@/lib/gallery-data";
+import { GalleryCategoryTabs } from "@/components/gallery-category-tabs";
+import { GalleryMasonryImageCard } from "@/components/gallery-masonry-image-card";
+import { GallerySkeletonGrid } from "@/components/gallery-skeleton-grid";
 
 const breakpointColumnsObj = {
   default: 4,
   1024: 3,
   768: 2,
-  500: 2,
+  500: 1,
 };
-
-function CategoryTabs({
-  categories,
-  selectedCategory,
-  onSelect,
-}: {
-  categories: string[];
-  selectedCategory: string;
-  onSelect: (category: string) => void;
-}) {
-  return (
-    <div className="flex gap-2 overflow-x-auto pb-4 mb-8 -mx-4 px-4 justify-start md:justify-center [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      {categories.map((category) => (
-        <button
-          key={category}
-          onClick={() => onSelect(category)}
-          className={`shrink-0 px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-            selectedCategory === category
-              ? "bg-foreground text-background shadow-md"
-              : "bg-secondary text-secondary-foreground hover:bg-accent"
-          }`}
-        >
-          {category.charAt(0).toUpperCase() + category.slice(1)}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function MasonryImageCard({ image, index }: { image: GalleryImage; index: number }) {
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
-      className="mb-4 md:mb-6 relative group overflow-hidden rounded-xl shadow-sm hover:shadow-xl transition-all duration-500 bg-muted/20"
-    >
-      <img
-        src={image.src}
-        alt={image.alt || "Gallery image"}
-        loading="lazy"
-        className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-      />
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
-    </motion.div>
-  );
-}
-
-function SkeletonGrid() {
-  const heights = ["h-64", "h-80", "h-96", "h-72", "h-80", "h-64", "h-96", "h-72"];
-  return (
-    <Masonry
-      breakpointCols={breakpointColumnsObj}
-      className="flex w-auto -ml-4 md:-ml-6"
-      columnClassName="pl-4 md:pl-6 bg-clip-padding"
-    >
-      {heights.map((h, i) => (
-        <div
-          key={i}
-          className={`mb-4 md:mb-6 rounded-xl bg-muted/60 animate-pulse ${h}`}
-        />
-      ))}
-    </Masonry>
-  );
-}
 
 export function GalleryGrid() {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -131,15 +68,15 @@ export function GalleryGrid() {
         </p>
       </motion.div>
 
-      <CategoryTabs
+      <GalleryCategoryTabs
         categories={allCategories}
         selectedCategory={selectedCategory}
         onSelect={setSelectedCategory}
       />
 
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full mx-auto px-0">
         {isLoading ? (
-          <SkeletonGrid />
+          <GallerySkeletonGrid breakpointColumns={breakpointColumnsObj} />
         ) : (
           <Masonry
             breakpointCols={breakpointColumnsObj}
@@ -147,7 +84,7 @@ export function GalleryGrid() {
             columnClassName="pl-4 md:pl-6 bg-clip-padding"
           >
             {filteredImages.map((image, index) => (
-              <MasonryImageCard
+              <GalleryMasonryImageCard
                 key={image._id ?? `${image.src}-${index}`}
                 image={image}
                 index={index}

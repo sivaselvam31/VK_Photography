@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 import { COLLECTIONS, DB_NAME, ImageDocument } from "@/lib/models";
@@ -8,7 +8,7 @@ async function getCollection() {
   return client.db(DB_NAME).collection<ImageDocument>(COLLECTIONS.images);
 }
 
-// GET /api/images — return all images (optionally ?category=wedding)
+// GET /api/images - return all images (optionally ?category=wedding)
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/images — insert a new image { src, alt, category }
+// POST /api/images - insert a new image { src, alt, category }
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// DELETE /api/images?_id=<objectId> — remove a single image
+// DELETE /api/images?_id=<objectId> - remove a single image
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

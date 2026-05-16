@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { COLLECTIONS, DB_NAME, CategoryDocument } from "@/lib/models";
 
@@ -7,7 +7,7 @@ async function getCollection() {
   return client.db(DB_NAME).collection<CategoryDocument>(COLLECTIONS.categories);
 }
 
-// GET /api/categories — return all categories
+// GET /api/categories - return all categories
 export async function GET() {
   try {
     const col = await getCollection();
@@ -19,7 +19,7 @@ export async function GET() {
   }
 }
 
-// POST /api/categories — insert a new category { id, title }
+// POST /api/categories - insert a new category { id, title }
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// DELETE /api/categories?id=wedding — remove category + cascade images
+// DELETE /api/categories?id=wedding - remove category + cascade images
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

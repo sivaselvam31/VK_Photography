@@ -1,4 +1,4 @@
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Gallery Types ────────────────────────────────────────────────────────
 
 export type Category = {
   id: string;
@@ -11,5 +11,3 @@ export type GalleryImage = {
   alt: string;
   category: string;
 };
-
-

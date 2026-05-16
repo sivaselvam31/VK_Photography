@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,7 +45,7 @@ export function Navbar() {
   }, []);
 
   return (
-    /* Outer wrapper — full width, fixed, centered */
+    /* Outer wrapper - full width, fixed, centered */
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-4 pointer-events-none">
       <motion.nav
         initial={{ y: -24, opacity: 0 }}

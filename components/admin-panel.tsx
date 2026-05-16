@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { Plus, Loader2, ImageUp, CheckCircle2 } from "lucide-react";
@@ -64,7 +64,7 @@ export function AdminPanel() {
     onConfirm: () => {},
   });
 
-  // ─── Helpers ───────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const showCategoryMessage = (type: "success" | "error", text: string) => {
     setCategoryMessage({ type, text });
@@ -98,7 +98,7 @@ export function AdminPanel() {
     loadData();
   }, []);
 
-  // ─── Handlers ──────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const handleAddCategory = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -234,7 +234,7 @@ export function AdminPanel() {
     setIsConfirmOpen(true);
   };
 
-  // ─── Render ───────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -248,12 +248,12 @@ export function AdminPanel() {
       {loading ? (
         <div className="flex items-center justify-center py-24 text-muted-foreground gap-3">
           <Loader2 size={20} className="animate-spin" /> Loading data from
-          database…
+          database...
         </div>
       ) : (
         <>
           <div className="grid gap-6 xl:grid-cols-[1.25fr_1fr]">
-            {/* ── Add Category ── */}
+            {/* â”€â”€ Add Category â”€â”€ */}
             <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-foreground mb-4">
                 Add New Category
@@ -314,7 +314,7 @@ export function AdminPanel() {
               </form>
             </section>
 
-            {/* ── Add Image ── */}
+            {/* â”€â”€ Add Image â”€â”€ */}
             <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-foreground mb-4">
                 Add Gallery Image
@@ -513,7 +513,7 @@ export function AdminPanel() {
             </section>
           </div>
 
-          {/* ── Tables ── */}
+          {/* â”€â”€ Tables â”€â”€ */}
           <div className="mt-10 flex flex-col gap-6">
             <CategoriesTable
               categories={categories}
